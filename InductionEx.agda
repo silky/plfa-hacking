@@ -66,3 +66,40 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_)
   ≡⟨⟩
     suc (suc m + n)
   ∎
+
+{-
+
+This doesn't work because the 1st and 2nd lines aren't
+proven to be equal yet.
+
++-comm : ∀ (m n : ℕ) → m + n ≡ n + m
++-comm zero n =
+  begin
+    zero + n
+  ≡⟨⟩
+    zero
+  ≡⟨ +-identityʳ n ⟩
+    n + zero
+  ∎
+-}
+
+
++-comm : ∀ (m n : ℕ) → m + n ≡ n + m
++-comm m zero =
+  begin
+    m + zero
+  ≡⟨ +-identityʳ m ⟩
+    m
+  ≡⟨⟩
+    zero + m
+  ∎
++-comm m (suc n) =
+  begin
+    m + suc n
+  ≡⟨ +-suc m n ⟩
+    suc (m + n)
+  ≡⟨ cong suc (+-comm m n) ⟩
+    suc (n + m)
+  ≡⟨⟩
+    suc n + m
+  ∎
