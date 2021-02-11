@@ -1,6 +1,6 @@
 # Agda-related hacking
 
-Following <https://plfa.github.io/Induction/>.
+Following <https://plfa.github.io/>.
 
 ### Trivia
 
