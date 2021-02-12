@@ -179,7 +179,39 @@ I have no idea how to do this.
 -- which is annoying; far harder to see where you're going wrong.
 +-swap' : ∀ (m n p : ℕ) → m + (n + p) ≡ n + (m + p)
 +-swap' m n p
-  rewrite sym (+-assoc m n p)      -- takes: m + (n + p) to (m + n) + p
-        | cong (_+ p) (+-comm m n) -- takes: (m + n) + p -> (n + m) + p
+  rewrite sym (+-assoc m n p)      -- takes  m + (n + p) to (m + n) + p
+        | cong (_+ p) (+-comm m n) -- takes (m + n) + p -> (n + m) + p
         | +-assoc n m p
   = refl
+
+
+-- Multiplication is repeated addition:
+--
+--   4 * m = m + (m + (m + (m + zero)))
+--
+-- TODO: This doesn't work, presently.
+*-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
+*-distrib-+ zero    n p = refl
+*-distrib-+ (suc m) n p =
+  begin
+    ((suc m) + n) * p
+  ≡⟨⟩
+    suc (m + n) * p
+  ≡⟨⟩
+    suc ((m + n) * p)
+  ≡⟨ cong suc (*-distrib-+ m n p) ⟩
+    suc (m * p + n * p)
+  ≡⟨ sym (+-assoc p (m * p) (n * p)) ⟩
+    ?
+  ∎
+
+{-
+-- From: https://github.com/kaaass/plfa-exercise/blob/master/src/plfa/Induction.agda#L172
+*-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
+*-distrib-+ zero    n p = refl
+*-distrib-+ (suc m) n p
+  rewrite *-distrib-+ m n p
+        | sym (+-assoc p (m * p) (n * p))
+  = refl
+-}
+
