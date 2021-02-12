@@ -68,12 +68,11 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_)
   ∎
 
 {-
-
 This doesn't work because the 1st and 2nd lines aren't
 proven to be equal yet.
 
-+-comm : ∀ (m n : ℕ) → m + n ≡ n + m
-+-comm zero n =
++-comm1 : ∀ (m n : ℕ) → m + n ≡ n + m
++-comm1 zero n =
   begin
     zero + n
   ≡⟨⟩
@@ -102,4 +101,20 @@ proven to be equal yet.
     suc (n + m)
   ≡⟨⟩
     suc n + m
+  ∎
+
++-rearrange : ∀ (m n p q : ℕ) → (m + n) + (p + q) ≡ m + (n + p) + q
++-rearrange m n p q =
+  begin
+    (m + n) + (p + q)
+  ≡⟨ +-assoc m n (p + q) ⟩
+    m + (n + (p + q))
+    -- Need the cong to make the expressions identicial
+    -- Need sym to flip the definition so that it typechecks
+  ≡⟨ cong (m +_) (sym (+-assoc n p q)) ⟩
+    m + ((n + p) + q)
+  ≡⟨ sym (+-assoc m (n + p) q) ⟩
+    (m + (n + p)) + q
+  ≡⟨⟩
+    m + (n + p) + q
   ∎
