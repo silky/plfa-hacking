@@ -118,3 +118,43 @@ proven to be equal yet.
   ≡⟨⟩
     m + (n + p) + q
   ∎
+
+
+{-
+Exercise:
+
++-finite-|-assoc =
+
+I have no idea how to do this.
+-}
+
++-assoc' : ∀ (m n p : ℕ) → (m + n) + p ≡ m + (n + p)
++-assoc' zero    n p                          = refl
++-assoc' (suc m) n p   rewrite +-assoc' m n p = refl
+
+-- Commutivity of addition with rewrite:
+
++-identity' : ∀ (n : ℕ) → n + zero ≡ n
++-identity' zero                          = refl
++-identity' (suc m) rewrite +-identity' m = refl
+
++-suc' : ∀ (m n : ℕ) → m + suc n ≡ suc (m + n)
++-suc' zero n                       = refl
++-suc' (suc m) n rewrite +-suc' m n = refl
+
++-comm' : ∀ (m n : ℕ) → m + n ≡ n + m
++-comm' m zero    rewrite +-identity' m = refl
++-comm' m (suc n)
+  rewrite +-suc'  m n
+        | +-comm' m n
+  = refl
+
+
+-- Done interactively:
+-- SPC-m-l - load
+-- SPC-m-f - next
+-- SPC-m-, - goal-and-context
+-- SPC-m-r - refine
++-associ : ∀ (m n p : ℕ) → (m + n) + p ≡ m + (n + p)
++-associ zero n p                           = refl
++-associ (suc m) n p rewrite +-associ m n p = refl
