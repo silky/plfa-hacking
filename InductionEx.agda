@@ -143,7 +143,7 @@ I have no idea how to do this.
 +-suc' (suc m) n rewrite +-suc' m n = refl
 
 +-comm' : ∀ (m n : ℕ) → m + n ≡ n + m
-+-comm' m zero    rewrite +-identity' m = refl
++-comm' m zero rewrite +-identity' m = refl
 +-comm' m (suc n)
   rewrite +-suc'  m n
         | +-comm' m n
@@ -158,3 +158,28 @@ I have no idea how to do this.
 +-associ : ∀ (m n p : ℕ) → (m + n) + p ≡ m + (n + p)
 +-associ zero n p                           = refl
 +-associ (suc m) n p rewrite +-associ m n p = refl
+
+-- Exercise: Swap
++-swap : ∀ (m n p : ℕ) → m + (n + p) ≡ n + (m + p)
++-swap m n p =
+  begin
+    m + (n + p)
+  ≡⟨ sym (+-assoc m n p) ⟩
+    (m + n) + p
+  -- This tripped me up; needed to use the left-version of
+  -- this function over here; rather than swapping the arguments
+  -- of cong, or something else.
+  ≡⟨ cong (_+ p) (+-comm m n) ⟩
+    (n + m) + p
+  ≡⟨ +-assoc n m p ⟩
+    n + (m + p)
+  ∎
+
+-- Rewrite version; shorter, but means the explanations are comments,
+-- which is annoying; far harder to see where you're going wrong.
++-swap' : ∀ (m n p : ℕ) → m + (n + p) ≡ n + (m + p)
++-swap' m n p
+  rewrite sym (+-assoc m n p)      -- takes: m + (n + p) to (m + n) + p
+        | cong (_+ p) (+-comm m n) -- takes: (m + n) + p -> (n + m) + p
+        | +-assoc n m p
+  = refl
