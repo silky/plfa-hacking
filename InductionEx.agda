@@ -190,22 +190,19 @@ I have no idea how to do this.
 --   4 * m = m + (m + (m + (m + zero)))
 --
 -- TODO: This doesn't work, presently.
-*-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
-*-distrib-+ zero    n p = refl
-*-distrib-+ (suc m) n p =
-  begin
-    ((suc m) + n) * p
-  ≡⟨⟩
-    suc (m + n) * p
-  ≡⟨⟩
-    suc ((m + n) * p)
-  ≡⟨ cong suc (*-distrib-+ m n p) ⟩
-    suc (m * p + n * p)
-  ≡⟨ sym (+-assoc p (m * p) (n * p)) ⟩
-    ?
-  ∎
+-- *-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
+-- *-distrib-+ zero    n p = refl
+-- *-distrib-+ (suc m) n p =
+--   begin
+--     ((suc m) + n) * p
+--   ≡⟨⟩
+--     suc (m + n) * p
+--   ≡⟨ cong suc (*-distrib-+ m n p) ⟩
+--     suc (m * p + n * p)
+--   ≡⟨ sym (+-assoc p (m * p) (n * p)) ⟩
+--     ?
+--   ∎
 
-{-
 -- From: https://github.com/kaaass/plfa-exercise/blob/master/src/plfa/Induction.agda#L172
 *-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
 *-distrib-+ zero    n p = refl
@@ -213,5 +210,44 @@ I have no idea how to do this.
   rewrite *-distrib-+ m n p
         | sym (+-assoc p (m * p) (n * p))
   = refl
+
+-- Glancing here: https://github.com/AlistairB/plfa/blob/master/src/part1/Induction.agda
+*-identityʳ : ∀ (m : ℕ) → m * (suc zero) ≡ m
+*-identityʳ zero =
+  begin
+    zero * suc zero
+  ≡⟨⟩
+    zero
+  ∎
+*-identityʳ (suc m) =
+  begin
+    (suc m) * (suc zero)
+  ≡⟨⟩
+    suc m * suc zero
+  ≡⟨⟩
+    suc (m * suc zero)
+  ≡⟨ cong ((suc zero) +_) (*-identityʳ m) ⟩
+    -- suc zero + (m * (suc zero)) ≡ suc zero + m
+    suc m
+  ∎
+
+-- Also totally wrong.
+{-
+*-assoc' : ∀ (m n p : ℕ) → (m * n) * p ≡ m * (n * p)
+*-assoc' zero    n p = refl
+*-assoc' (suc m) n p =
+  begin
+    ((suc m) * n) * p
+  ≡⟨ cong suc (*-distrib-+ n (m * n) p) ⟩
+    (n * p) + (m * n) * p
+  ≡⟨ cong suc (*-assoc' m n p) ⟩
+    (m * n * p)
+  ∎
 -}
 
+*-assoc : ∀ (m n p : ℕ) → (m * n) * p ≡ m * (n * p)
+*-assoc zero    n p = refl
+*-assoc (suc m) n p
+  rewrite *-distrib-+ n (m * n) p -- (n * p) + (m * n) * p
+        | *-assoc m n p           -- (m * n * p)
+  = refl
