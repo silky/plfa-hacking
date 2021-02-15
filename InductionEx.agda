@@ -189,24 +189,29 @@ I have no idea how to do this.
 --
 --   4 * m = m + (m + (m + (m + zero)))
 --
--- TODO: This doesn't work, presently.
--- *-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
--- *-distrib-+ zero    n p = refl
--- *-distrib-+ (suc m) n p =
---   begin
---     ((suc m) + n) * p
---   ≡⟨⟩
---     suc (m + n) * p
---   ≡⟨ cong suc (*-distrib-+ m n p) ⟩
---     suc (m * p + n * p)
---   ≡⟨ sym (+-assoc p (m * p) (n * p)) ⟩
---     ?
---   ∎
-
--- From: https://github.com/kaaass/plfa-exercise/blob/master/src/plfa/Induction.agda#L172
 *-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
 *-distrib-+ zero    n p = refl
-*-distrib-+ (suc m) n p
+*-distrib-+ (suc m) n p =
+  begin
+    ((suc m) + n) * p
+  ≡⟨⟩
+    (suc (m + n)) * p
+  ≡⟨⟩
+    p + ((m + n) * p)
+  ≡⟨ cong (p +_) (*-distrib-+ m n p) ⟩
+    p + (m * p + n * p)
+  ≡⟨ sym (+-assoc p (m * p) (n * p)) ⟩
+    (p + (m * p)) + (n * p)
+  ≡⟨⟩
+    p + (m * p) + n * p
+  ≡⟨⟩
+    suc m * p + n * p
+  ∎
+
+-- From: https://github.com/kaaass/plfa-exercise/blob/master/src/plfa/Induction.agda#L172
+*-distrib-+' : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
+*-distrib-+' zero    n p = refl
+*-distrib-+' (suc m) n p
   rewrite *-distrib-+ m n p
         | sym (+-assoc p (m * p) (n * p))
   = refl
@@ -231,23 +236,64 @@ I have no idea how to do this.
     suc m
   ∎
 
--- Also totally wrong.
-{-
 *-assoc' : ∀ (m n p : ℕ) → (m * n) * p ≡ m * (n * p)
 *-assoc' zero    n p = refl
 *-assoc' (suc m) n p =
   begin
     ((suc m) * n) * p
-  ≡⟨ cong suc (*-distrib-+ n (m * n) p) ⟩
-    (n * p) + (m * n) * p
-  ≡⟨ cong suc (*-assoc' m n p) ⟩
-    (m * n * p)
+  ≡⟨⟩
+    (n + (m * n)) * p
+  ≡⟨ (*-distrib-+ n (m * n) p) ⟩
+    (n * p) + ((m * n) * p)
+  ≡⟨ cong ((n * p) +_) (*-assoc' m n p) ⟩
+    (n * p) + (m * (n * p))
   ∎
--}
 
 *-assoc : ∀ (m n p : ℕ) → (m * n) * p ≡ m * (n * p)
 *-assoc zero    n p = refl
 *-assoc (suc m) n p
-  rewrite *-distrib-+ n (m * n) p -- (n * p) + (m * n) * p
-        | *-assoc m n p           -- (m * n * p)
+  rewrite *-distrib-+ n (m * n) p
+        | *-assoc m n p
   = refl
+
+*-zeroʳ : ∀ (m : ℕ) → m * zero ≡ zero
+*-zeroʳ zero = refl
+*-zeroʳ (suc m)
+  rewrite *-zeroʳ m
+  = refl
+
+
+*-suc : ∀ (m n : ℕ) → m * suc n ≡ m + m * n
+*-suc zero n = refl
+*-suc (suc m) n =
+  begin
+    suc m * suc n
+  ≡⟨⟩
+    suc n + (m * suc n)
+  ≡⟨ cong (suc n +_) (*-suc m n) ⟩
+    suc n + (m + m * n)
+  ≡⟨⟩
+    suc (n + (m + m * n))
+  ≡⟨ cong suc (sym (+-assoc n m (m * n))) ⟩
+    suc (n + m + m * n)
+  ≡⟨ cong (λ x → suc (x + m * n)) (+-comm n m) ⟩
+    suc (m + n + m * n)
+  ≡⟨ cong suc (+-assoc m n (m * n)) ⟩
+    suc (m + (n + m * n))
+  ≡⟨⟩
+    suc m + suc m * n
+  ∎
+
+
+*-comm : ∀ (m n : ℕ) → m * n ≡ n * m
+*-comm m zero rewrite *-zeroʳ m = refl
+*-comm m (suc n) =
+  begin
+    m * (suc n)
+  ≡⟨ *-suc m n ⟩
+    m + (m * n)
+  ≡⟨ cong (m +_) (*-comm m n)⟩
+    m + (n * m)
+  ≡⟨⟩
+    (suc n) * m
+  ∎
