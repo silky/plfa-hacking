@@ -297,3 +297,25 @@ I have no idea how to do this.
   ≡⟨⟩
     (suc n) * m
   ∎
+
+
+monus : ∀ (n : ℕ) → zero ∸ n ≡ zero
+monus zero                    = refl
+monus (suc n) rewrite monus n = refl -- With induction
+
+
+∸-|-assoc : ∀ (m n p : ℕ) → (m ∸ n) ∸ p ≡ m ∸ (n ∸ p)
+∸-|-assoc zero n p    =
+  begin
+    (zero ∸ n) ∸ p
+  ≡⟨ cong (_∸ p) (monus n) ⟩
+    zero ∸ p
+  ≡⟨ monus p ⟩
+    zero
+  ≡⟨ sym (monus (n ∸ p)) ⟩
+    zero ∸ (n ∸ p)
+  ∎
+∸-|-assoc (suc m) n p =
+  begin
+    ?
+  ∎
