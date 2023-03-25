@@ -12,7 +12,15 @@ data ℕ : Set where
   suc  : ℕ → ℕ
 {-# BUILTIN NATURAL ℕ #-}
 
+-- Pseudo-Haskell
+--
+-- Vec n = Vector of Length n
+--
+-- concatenate :: "Vec n" -> "Vec m" -> "Vec (n + m)"
+-- concatenate a b = a      -- Type error
+-- concatenate a b = a ++ a -- Type error
 
+-- Unary encoding of Naturals
 one   = suc zero
 two   = suc one
 three = suc two
@@ -31,7 +39,7 @@ zero + n  = n
 suc m + n = suc (m + n)
 -- suc m + n   =
 -- zero + n    = n
--- (suc m) + n = suc (m + n)
+-- (suc m) + n = suc (m +r n)
 
 
 _ : 2 + 3 ≡ 5

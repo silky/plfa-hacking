@@ -169,6 +169,9 @@ I have no idea how to do this.
   -- This tripped me up; needed to use the left-version of
   -- this function over here; rather than swapping the arguments
   -- of cong, or something else.
+  -- cong (+-comm m n) (_+ p)
+  -- +-comm m n : n + m
+  -- ≡⟨ cong ((+-comm m n) +_) p ⟩
   ≡⟨ cong (_+ p) (+-comm m n) ⟩
     (n + m) + p
   ≡⟨ +-assoc n m p ⟩
@@ -304,6 +307,7 @@ monus zero                    = refl
 monus (suc n) rewrite monus n = refl -- With induction
 
 
+{-
 ∸-|-assoc : ∀ (m n p : ℕ) → (m ∸ n) ∸ p ≡ m ∸ (n ∸ p)
 ∸-|-assoc zero n p    =
   begin
@@ -319,3 +323,14 @@ monus (suc n) rewrite monus n = refl -- With induction
   begin
     ?
   ∎
+-}
+
+
+{-
++-swap : ∀ (m n p : ℕ) → m + (n + p) ≡ n + (m + p)
++-swap m n p
+  rewrite +- comm n p
+  rewrite sym (+-assoc m p n)
+  rewrite +-comm (m + p) n
+  = refl
+-}
